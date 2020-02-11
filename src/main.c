@@ -81,13 +81,14 @@ int main(int argc, char **argv) {
 
 	g = graph_init();
 
-	g = pjk_read(g, "example0.net");
+	g = pjk_read(g, net_file_name);
 
 	graph_print(g);
 
 	walk(g);
 
-	plot(g);
+        data_fwrite(g);
+	R_fwrite_script(g);
 
 	graph_destroy(g);
 
