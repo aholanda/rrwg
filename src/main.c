@@ -39,15 +39,8 @@ static void eval_arg(char *a, char on_off) {
         if (on_off == '+')
                 state = TRUE;
 
-        while (*(++a) != '\0') {
-                switch (*a) {
-                case 'v':
-                        flags['v'] = state;
-                        break;
-                default:
-                        break;
-                }
-        }
+        while (*(++a) != '\0')
+                flags[(int)*a] = state;
 }
 
 static Boolean scan_args(int ac, char**av) {
