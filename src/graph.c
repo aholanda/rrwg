@@ -26,7 +26,7 @@ static double __geom__(double x, double y, double alpha) {
 #warning implement GEOM function
 	return 1.0;
 }
-void graph_assign_function(struct graph *g, char*name, char*fn) {
+void graph_assign_function(struct graph *g, char*name) {
        assert(g);
        assert(name);
 
@@ -37,7 +37,7 @@ void graph_assign_function(struct graph *g, char*name, char*fn) {
        else {
                fprintf(stderr,
                 "fatal: unrecognized function \"%s\" in %s\n",
-                name, fn);
+                name, net_file_name);
                exit(EXIT_FAILURE);
        }
 }
@@ -142,6 +142,8 @@ void graph_visits_set(struct graph*g,
 	assert(v);
         assert(w);
 	assert(idx>=0);
+        assert(nvisits>0);
+
         if (v->visits==NULL)
                 v->visits = CALLOC(g->w, sizeof(struct walker*));
 
