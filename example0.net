@@ -1,0 +1,15 @@
+# C
+alpha= 1.1
+function=exp
+maxsteps=10
+particles=2
+
+* Vertices
+a @1=10
+b 1=20 @2=30
+c 1=2
+
+* Edges
+a -- b
+b -- c
+a -- c
