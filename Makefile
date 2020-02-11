@@ -1,9 +1,10 @@
 CFLAGS := -Wall -I./include -g
 LDFLAGS := -lm
+PREFIX := /usr/local
 
 VPATH = src:include
 
-rrwg: alloc.o graph.o io.o parse.o plot.o walk.o main.o
+rrwg: alloc.o data.o graph.o io.o main.o parse.o R.o walk.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 trash += rrwg
@@ -22,7 +23,11 @@ clean:
 	$(RM) -r $(trash)
 
 checkalloc: rrwg
-	valgrind -v --leak-check=full ./$<
+	valgrind -v --leak-check=full --track-origins=yes ./$<
+
+install: rrwg rrwg.1
+	@install rrwg $(PREFIX)/bin
+	@install rrwg.1 $(PREFIX)/man/man1
 
 help:
 	@echo "---------------------------------------------------------------------"
@@ -35,4 +40,8 @@ help:
 	@echo " \t=> Clean up all generated files."
 	@echo "make checkalloc"
 	@echo "\t=> Check program memory management."
+	@echo "make install"
+	@echo "\t=> Intall the program using as prefix $(PREFIX)."
 	@echo "---------------------------------------------------------------------"
+
+.PHONY: clean help install
