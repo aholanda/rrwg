@@ -5,7 +5,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* MACROS */
 #define MAXTOKEN 32
+/* Maximum file name length, discount the 4 bytes extension. */
+#define MAXFN 60
+
+/* TYPEDEFS */
+typedef short Boolean;
+enum Boolean_enum {FALSE, TRUE};
+
+/* begin GLOBAL VARIABLES */
+extern char flags[128];
+extern char dat_file_name[MAXFN];
+extern char net_file_name[MAXFN];
+
+/* end GLOBAL VARIABLES */
 
 #ifdef GNUC
 #define INLINE __attribute__((always_inline))
@@ -121,8 +135,6 @@ extern void Fclose(FILE *fp)
 /* end IO */
 
 /* begin PARSER */
-#define MAXFN 256
-
 /* Read file name in Pajek format and return the graph described in
  * it.
  */
