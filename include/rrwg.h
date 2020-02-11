@@ -27,7 +27,7 @@ extern char net_file_name[MAXFN];
 #define INLINE inline
 #endif
 
-/* begin MEMORY ALLOCATION */
+/* ALLOC.C */
 #define ALLOC(sz) Malloc((sz), __FILE__, (int)__LINE__)
 #define CALLOC(n, sz) Calloc((n), (sz), __FILE__, (int)__LINE__)
 #define REALLOC(ptr, sz) Malloc((ptr), (sz), __FILE__, (int)__LINE__)
@@ -41,9 +41,9 @@ extern void Free(void *ptr, const char *cfile, const int line)
 __attribute__((always_inline))
 #endif
 ;
-/* end MEMORY ALLOCATION */
+/* alloc.c */
 
-/* begin GRAPH */
+/* GRAPH.C */
 /* Maximum number of vertices */
 #define MAXN 128
 /* Maximum number of edges */
@@ -71,7 +71,6 @@ struct arc {
 
 struct walker {
 	char name[MAXTOKEN];
-	int steps0; /* number of steps at time 0 (zero) */
 	struct vertex **path; /* all vertices visited */
 };
 
@@ -101,7 +100,7 @@ enum context {GRAPH, VERTEX, ARC, EDGE=ARC};
 
 extern struct graph *graph_init();
 extern void graph_assign_function(struct graph*,
-							char*function_name, char*filename);
+							char*function_name);
 extern void graph_init_walkers(struct graph*, int nwalkers);
 extern void graph_set_name(char*name);
 extern struct vertex *graph_vertex_add(struct graph*, char *name);
@@ -122,9 +121,9 @@ extern void graph_visit(struct graph*,
 /* Vertex */
 extern void graph_vertex_visit(struct graph*, struct vertex*v,
 								struct walker*w);
-/* end GRAPH */
+/* graph.c */
 
-/* begin IO */
+/* IO.C */
 #define BUFLEN 256
 extern FILE *Fopen(char *filename, const char *mode);
 extern void Fclose(FILE *fp)
@@ -132,9 +131,9 @@ extern void Fclose(FILE *fp)
 	__attribute__((always_inline))
 #endif
 	;
-/* end IO */
+/* io.c */
 
-/* begin PARSER */
+/* PARSER.C */
 /* Read file name in Pajek format and return the graph described in
  * it.
  */
@@ -152,20 +151,24 @@ extern void rm_ext(char *filename);
 /* Append the string suf in the end of str. */
 extern void append_suffix(char str[], char *suf);
 
-/* end PARSER */
+/* parser.c */
 
-/* begin PLOT */
-/* Write commands to plot the curves into a file named with graph name
- * plus the extension of the program to be used to plot. */
-extern void plot(struct graph*);
-
-/* end PLOT */
-
-/* begin WALK */
+/* WALK.C */
 /* Number of parameters to be set. */
 #define NPARMS 4
 
 extern void walk(struct graph*);
-/* end WALK */
+/* walk.c */
+
+/* DATA.C */
+#define DATA_SEP ";"
+extern void data_fwrite(struct graph*);
+/* data.c */
+
+/* r.C */
+/* Write commands to plot the curves into a file named with graph name
+ * plus the extension of the program to be used to plot. */
+extern void R_fwrite_script(struct graph*);
+/* R.c */
 
 #endif
