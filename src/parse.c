@@ -68,41 +68,72 @@ static int input_ln(void) {
 	return 0;
 }
 
-static INLINE void context_switch(struct graph*g, char*fn) {
+static void check_constraints(struct graph *g) {
 	struct vertex *v;
         struct walker *w;
-	char buf[MAXFN];
-	int i;
+       	int i, j;
+        /* Array with all visits at time indexed by walker. */
+        int *allvisits0;
+        int prev;
+	/*
+	  Check if all walkers have a initial location determined.
+	*/
+        allvisits0 = CALLOC(g->w, sizeof(int));
+	for (i=0; i<g->w; i++) {
+		w = &g->walkers[i];
+                v = w->path[0];
+	        if (v == NULL) {
+			fprintf(stderr, "%s:%d Walker %d was not initialized.\n",
+			      net_file_name, lineno, (i+1));
+                               exit(EXIT_FAILURE);
+		}
+                /*
+                   Set default number of steps for non-initialized
+                   initial (t=0) walker's visits to vertices.
+                 */
+                for (j=0; j<g->n; j++) {
+                        v = &g->vertices[j];
+                        if (v->visits[i] == 0)
+                                graph_visits_set(g, v, w, 0, DEFAULT_STEPS0);
 
+                         allvisits0[i] += v->visits[i];
+                 }
+	}
+        prev=allvisits0[0];
+        for (i=1; i<g->w; i++) {
+                if (prev != allvisits0[i]) {
+			fprintf(stderr,
+                                "%s:%d Different initial number of"
+                                " steps for walkers %d (%d) and %d (%d).\n",
+			        net_file_name, lineno,
+                                i, allvisits0[i-1], i+1, allvisits0[i]);
+                               exit(EXIT_FAILURE);
+                }
+                prev=allvisits0[i];
+        }
+        FREE(allvisits0);
+}
+
+static INLINE void context_switch(struct graph*g) {
+        static char buf[MAXFN];
 /* Check some constraints or set properties before changing context */
 	switch(ctx) {
-	case GRAPH:
+	case GRAPH: /* Graph section was completed */
 		/* Check if all parameters were checked. */
 		if (!parms_ok) {
 			fprintf(stderr, "%s:%d Not all parameters were set.\n",
-				      fn, lineno);
+				      net_file_name, lineno);
                         exit(EXIT_FAILURE);
                 }
-		strncpy(buf, fn, MAXFN);
+		strncpy(buf, net_file_name, MAXFN);
 		/* Remove the extension of file name. */
 		rm_ext(buf);
 		/* Set the name of the graph with input file name
 		 * without extension. */
 		graph_set_name(buf);
 		break;
-	case VERTEX:
-		/*
-		  Check if all walkers have a initial location determined.
-		*/
-		for (i=0; i<g->w; i++) {
-			w = &g->walkers[i];
-                        v = w->path[0];
-			if (v == NULL) {
-				fprintf(stderr, "%s:%d Walker %d was not initialized.\n",
-				      fn, lineno, (i+1));
-                                exit(EXIT_FAILURE);
-			}
-		}
+	case VERTEX: /* Vertex section was completed */
+                check_constraints(g);
   		break;
 	default:
 		break;
@@ -118,7 +149,7 @@ static INLINE int cmp1(int c) {
 	return c==(int)'-';
 }
 
-static void fill_buffer_up_to(char buf[], enum tokcat stop, char*fn) {
+static void fill_buffer_up_to(char buf[], enum tokcat stop) {
 	int (*cmp)(int c);
 
 	switch (stop) {
@@ -133,7 +164,8 @@ static void fill_buffer_up_to(char buf[], enum tokcat stop, char*fn) {
 	case EDGE_SEP:
 		cmp=&cmp1;
 	default:
-		fprintf(stderr, "%s:%d Unknown token..", fn, lineno);
+		fprintf(stderr, "%s:%d Unknown token..",
+                        net_file_name, lineno);
                 exit(EXIT_FAILURE);
 		break;
 	}
@@ -156,16 +188,16 @@ static void fill_buffer_up_to(char buf[], enum tokcat stop, char*fn) {
   and
   cp points to value string start.
 */
-static void fill_keyval(char*fn) {
+static void fill_keyval() {
 	if (*cp=='\0') return;
 
 	skip_spaces(); /* touch key */
-	fill_buffer_up_to(key, ASSIGN, fn); /* fill token stopping one char after '=' */
+	fill_buffer_up_to(key, ASSIGN); /* fill token stopping one char after '=' */
 	skip_spaces(); /* touch value */
-	fill_buffer_up_to(val, SPACE, fn); /* fill token stopping one char after SPACE cat */
+	fill_buffer_up_to(val, SPACE); /* fill token stopping one char after SPACE cat */
 }
 
-static void scan_graph_keyval(struct graph*g, char *fn) {
+static void scan_graph_keyval(struct graph*g) {
 	static char funcname[8];
 	static double alpha=EMPTY_COEFF;
 	static int maxsteps = NOSTEP;
@@ -173,7 +205,7 @@ static void scan_graph_keyval(struct graph*g, char *fn) {
 	/* Count the number of parameters already set. */
 	static int nparms_count=0;
 
-	fill_keyval(fn);
+	fill_keyval();
 
 	if (strncmp(key, "alpha", MAXTOKEN)==0) {
 		alpha = atof(val);
@@ -188,7 +220,8 @@ static void scan_graph_keyval(struct graph*g, char *fn) {
 		nwalkers = atoi(val);
 		nparms_count++;
 	} else {
-		fprintf(stderr, "%s:%d Syntax error\n", fn, lineno);
+		fprintf(stderr, "%s:%d Syntax error\n",
+                        net_file_name, lineno);
                 exit(EXIT_FAILURE);
         }
 
@@ -197,12 +230,12 @@ static void scan_graph_keyval(struct graph*g, char *fn) {
 		graph_init_walkers(g, nwalkers);
 		g->alpha = alpha;
 	        g->maxsteps =  maxsteps;
-		graph_assign_function(g, funcname, fn);
+		graph_assign_function(g, funcname);
 		parms_ok = 1;
 	}
 }
 
-static void scan_vertex_keyval(struct graph*g, struct vertex*v, char*fn) {
+static void scan_vertex_keyval(struct graph*g, struct vertex*v) {
 	int is_starting_point = 0; /* particle starts at the vertex? */
 	int pidx=-1; /* particle index */
 	struct walker *w;
@@ -214,7 +247,7 @@ static void scan_vertex_keyval(struct graph*g, struct vertex*v, char*fn) {
 	*/
 	static char rkey[MAXTOKEN-1];
 
-	fill_keyval(fn);
+	fill_keyval();
 
 	/* Check if the vertex is a starting point of particle */
 	if (key[0]==LOCSYM) {
@@ -225,43 +258,42 @@ static void scan_vertex_keyval(struct graph*g, struct vertex*v, char*fn) {
 
 	pidx = atoi(rkey) - 1;
 	w = &g->walkers[pidx];
-	w->steps0 = atoi(val);
-	graph_visits_set(g, v, w, 0, w->steps0);
+	graph_visits_set(g, v, w, 0, atoi(val));
 	if (is_starting_point)
 			w->path[0] = v;
 }
 
-static void scan_vertex(struct graph *g, char*fn) {
+static void scan_vertex(struct graph *g) {
 	struct vertex *v;
 
-	fill_buffer_up_to(key, SPACE, fn);
+	fill_buffer_up_to(key, SPACE);
 	v = graph_vertex_add(g, key);
 
 	while (*cp) {
 		skip_spaces();
-		scan_vertex_keyval(g, v, fn);
+		scan_vertex_keyval(g, v);
 	}
 }
 
-static void scan_edge(struct graph *g, char*fn) {
-	fill_buffer_up_to(key, EDGE, fn); /* from vertex */
+static void scan_edge(struct graph *g) {
+	fill_buffer_up_to(key, EDGE); /* from vertex */
 	cp += 2; /* skip '--' on "a -- b" edge*/
 	skip_spaces();
-	fill_buffer_up_to(val, SPACE, fn); /* to vertex */
+	fill_buffer_up_to(val, SPACE); /* to vertex */
 	graph_edge_add(g, key, val);
 }
 
-static void eval(struct graph *g, char*fn) {
+static void eval(struct graph *g) {
 	switch(ctx) {
 	case GRAPH:
-		scan_graph_keyval(g, fn);
+		scan_graph_keyval(g);
 		break;
 	case VERTEX:
-		scan_vertex(g, fn);
+		scan_vertex(g);
 		break;
 
 	case EDGE:
-		scan_edge(g, fn);
+		scan_edge(g);
 		break;
 
 	default:
@@ -286,10 +318,10 @@ struct graph *pjk_read(struct graph *g, char *filename) {
 
 		if (*cp=='*') {
 			// TODO: get which context is in
-			context_switch(g, filename);
+			context_switch(g);
 			continue;
 		}
-		eval(g, filename);
+		eval(g);
 	}
 	Fclose(fp);
 
