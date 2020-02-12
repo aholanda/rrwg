@@ -38,6 +38,7 @@ void graph_assign_function(struct graph *g, char*name) {
                 name, net_file_name);
                exit(EXIT_FAILURE);
        }
+       strncpy(g->funcname, name, MAXTOKEN);
 }
 void graph_init_walkers(struct graph*g, int nwalkers) {
         assert(nwalkers>1);
@@ -180,22 +181,35 @@ INLINE void graph_free(struct graph *g) {
 }
 
 void graph_print(struct graph*g) {
-	struct vertex *v, *w;
+	struct vertex *v, *x;
 	struct arc *a;
+        struct walker *w;
 	int i, j;
+        char loc;
 
-	printf("* Graph(V, E) %s(%d, %d)\n", g->name, g->n, g->m);
+        fprintf(stderr, "* Parameters\n");
+        fprintf(stderr, "alpha=%2.3f\n", g->alpha);
+        fprintf(stderr, "function=%s\n", g->funcname);
+        fprintf(stderr, "maxsteps=%d\n", g->maxsteps);
+        fprintf(stderr, "walkers=%d\n", g->w);
+
+	fprintf(stderr, "* Graph(V, E)=%s(%d, %d)\n", g->name, g->n, g->m);
 	for (i=0; i<g->n; i++) {
 		v = &g->vertices[i];
-		printf("%s:", v->name);
+		fprintf(stderr, "%s:", v->name);
 		for (a=v->arcs; a; a=a->next){
-			w = a->tip;
-			printf(" %s", w->name);
+			x = a->tip;
+			fprintf(stderr, " %s", x->name);
 		}
-		printf("; P.");
-		for (j=0; j<g->w; j++)
-			printf(" %d=%d", j+1, v->visits[j]);
+		fprintf(stderr, ";");
+		for (j=0; j<g->w; j++) {
+                        loc = ' ';
+                        w = &g->walkers[j];
+                        if (w->path[0]==v)
+                                loc = '@';
+			fprintf(stderr, " %cvisits(walker%d, t0)=%d", loc, j+1, v->visits[j]);
+                }
 
-		printf("\n");
+		fprintf(stderr, "\n");
 	}
 }

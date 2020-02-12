@@ -81,7 +81,7 @@ struct graph {
 	struct arc area[MAXM];
 
 	/* Walk data */
-	char function[MAXTOKEN]; /* repelling function label */
+	char funcname[MAXTOKEN]; /* repelling function label */
 	struct walker *walkers; /* who will walk through vertices */
 	int w; /* number of walkers */
 	/* function plugged to calculate repelling index */
