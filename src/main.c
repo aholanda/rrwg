@@ -22,8 +22,10 @@ static void init() {
 }
 
 static void show_usage_and_exit(char **av) {
-        fprintf(stderr, "usage: %s [+v] infile.net\n", av[0]);
-
+        fprintf(stderr, "usage: %s [-b+v] infile.net\n", av[0]);
+        fprintf(stderr, "where:\n");
+        fprintf(stderr, "\t-b:\tsupress the banner;\n");
+        fprintf(stderr, "\t+v:\tincrease verbosity.\n");
         exit(EXIT_FAILURE);
 }
 
@@ -68,15 +70,11 @@ int main(int argc, char **argv) {
         go_on = scan_args(argc, argv);
         if (!go_on)
                 show_usage_and_exit(argv);
-
         show_banner(argv);
-        printf("%s\n", net_file_name);
 
 	g = graph_new();
 
 	g = pjk_read(g, net_file_name);
-
-	graph_print(g);
 
 	walk(g);
 
