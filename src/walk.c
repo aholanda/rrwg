@@ -41,7 +41,8 @@ static double calc_repellency(struct graph*g, struct vertex *v,
 	  but pidx.
 	  - The denominator is the normalized visits of all particles.
 	*/
-	return g->func(sum, 0.0, g->alpha);
+	return g->func(sum, g->w, g->alpha,
+                        (double)v->visits[idx]/allvisits);
 }
 
 static double calc_total_repellency(struct graph*g, struct vertex *v,

@@ -85,7 +85,7 @@ struct graph {
 	struct walker *walkers; /* who will walk through vertices */
 	int w; /* number of walkers */
 	/* function plugged to calculate repelling index */
-	double (*func)(double x, double y, double alpha);
+	double (*func)(double x, double y, double alpha, double b);
 	/* repellency */
 	double alpha;
 	/* maximum number of steps */
@@ -98,16 +98,16 @@ struct graph {
 */
 enum context {GRAPH, VERTEX, ARC, EDGE=ARC};
 
-extern struct graph *graph_init();
+extern struct graph *graph_new();
 extern void graph_assign_function(struct graph*,
 							char*function_name);
 extern void graph_init_walkers(struct graph*, int nwalkers);
-extern void graph_set_name(char*name);
+extern void graph_set_name(struct graph*, char*name);
 extern struct vertex *graph_vertex_add(struct graph*, char *name);
 extern struct arc *graph_edge_add(struct graph*, char *from, char *to);
 extern void graph_print(struct graph*);
 extern void graph_self_loops_add(struct graph*);
-extern void graph_destroy(struct graph*);
+extern void graph_free(struct graph*);
 extern void graph_visits_set(struct graph*,
 						struct vertex*,
 						struct walker*,

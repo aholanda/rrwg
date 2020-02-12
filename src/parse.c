@@ -130,7 +130,7 @@ static INLINE void context_switch(struct graph*g) {
 		rm_ext(buf);
 		/* Set the name of the graph with input file name
 		 * without extension. */
-		graph_set_name(buf);
+		graph_set_name(g, buf);
 		break;
 	case VERTEX: /* Vertex section was completed */
                 check_constraints(g);

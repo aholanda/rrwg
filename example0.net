@@ -1,7 +1,7 @@
 # C
-alpha=3.1
-function=exp
-maxsteps=5
+alpha=9.1
+function=geom
+maxsteps=500
 particles=2
 
 * Vertices

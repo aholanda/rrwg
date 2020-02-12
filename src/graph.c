@@ -5,35 +5,33 @@
 
 #include "rrwg.h"
 
-struct graph graphs[16];
-struct graph *g;
-
-struct graph *graph_init() {
-	g = &graphs[0];
+struct graph *graph_new() {
+        struct graph *g;
+	g = CALLOC(1, sizeof(struct graph));
 	return g;
 }
 
-void graph_set_name(char *name) {
+void graph_set_name(struct graph *g, char *name) {
+        assert(g);
 	assert(name);
 	strncpy(g->name, name, MAXFN);
 }
 
-static double __exp__(double x, double y, double alpha) {
+static double expa(double x, double y, double alpha, double b) {
 	return exp(-alpha*x);
 }
 
-static double __geom__(double x, double y, double alpha) {
-#warning implement GEOM function
-	return 1.0;
+static double geom(double x, double y, double alpha, double b) {
+	return b*pow(y-x, alpha);
 }
 void graph_assign_function(struct graph *g, char*name) {
        assert(g);
        assert(name);
 
        if (strncmp(name, "exp", 4)==0)
-               g->func = &__exp__;
+               g->func = &expa;
        else if (strncmp(name, "geom", 5)==0)
-               g->func = &__geom__;
+               g->func = &geom;
        else {
                fprintf(stderr,
                 "fatal: unrecognized function \"%s\" in %s\n",
@@ -162,7 +160,7 @@ void graph_visit(struct graph*g, struct vertex*v,
         w->path[time] = v;
 }
 
-INLINE void graph_destroy(struct graph*g) {
+INLINE void graph_free(struct graph *g) {
 	struct vertex *v;
         struct walker *w;
 	int i;
@@ -177,6 +175,7 @@ INLINE void graph_destroy(struct graph*g) {
 			FREE(w->path);
 		}
                 FREE(g->walkers);
+                FREE(g);
 	}
 }
 

@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
         show_banner(argv);
         printf("%s\n", net_file_name);
 
-	g = graph_init();
+	g = graph_new();
 
 	g = pjk_read(g, net_file_name);
 
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
         data_fwrite(g);
 	R_fwrite_script(g);
 
-	graph_destroy(g);
+	graph_free(g);
 
 	return EXIT_SUCCESS;
 }
