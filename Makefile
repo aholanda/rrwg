@@ -29,6 +29,10 @@ install: rrwg rrwg.1
 	@install rrwg $(PREFIX)/bin
 	@install rrwg.1 $(PREFIX)/man/man1
 
+uninstall:
+	@rm -vf rrwg $(PREFIX)/bin/rrwg
+	@rm -vf rrwg.1 $(PREFIX)/man/man1/rrwg.1
+
 help:
 	@echo "---------------------------------------------------------------------"
 	@echo "* RRWG - possible targets:"
@@ -42,6 +46,8 @@ help:
 	@echo "\t=> Check program memory management."
 	@echo "make install"
 	@echo "\t=> Intall the program using as prefix $(PREFIX)."
+	@echo "make uninstall"
+	@echo "\t=> Remove the program from prefix $(PREFIX)."
 	@echo "---------------------------------------------------------------------"
 
-.PHONY: clean help install
+.PHONY: clean help install uninstall
