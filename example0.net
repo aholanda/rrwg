@@ -1,8 +1,8 @@
 # C
-alpha=9.1
+alpha=2.1
 function=geom
-maxsteps=500
-particles=2
+maxsteps=3
+walkers=2
 
 * Vertices
 a @1=10
