@@ -5,12 +5,12 @@
 
 #include "rrwg.h"
 
-/* Symbol to indicate the vertex where the particle starts at. */
+/* Symbol to indicate the vertex where the walker starts at. */
 #define LOCSYM '@'
 
 enum tokcat {ASSIGN, EDGE_SEP, SPACE};
 
-char *filename; /* current file name */
+extern char flags[128];
 
 static enum context ctx;
 
@@ -216,7 +216,7 @@ static void scan_graph_keyval(struct graph*g) {
 	} else if (strncmp(key, "maxsteps", MAXTOKEN)==0) {
 		maxsteps = atoi(val);
 		nparms_count++;
-	} else if (strncmp(key, "particles", MAXTOKEN)==0) {
+	} else if (strncmp(key, "walkers", MAXTOKEN)==0) {
 		nwalkers = atoi(val);
 		nparms_count++;
 	} else {
@@ -236,8 +236,8 @@ static void scan_graph_keyval(struct graph*g) {
 }
 
 static void scan_vertex_keyval(struct graph*g, struct vertex*v) {
-	int is_starting_point = 0; /* particle starts at the vertex? */
-	int pidx=-1; /* particle index */
+	int is_starting_point = 0; /* walker starts at the vertex? */
+	int pidx=-1; /* walker index */
 	struct walker *w;
 	/*
 	  a copy of key with '*' char removed
@@ -249,7 +249,7 @@ static void scan_vertex_keyval(struct graph*g, struct vertex*v) {
 
 	fill_keyval();
 
-	/* Check if the vertex is a starting point of particle */
+	/* Check if the vertex is a starting point of walker */
 	if (key[0]==LOCSYM) {
 		is_starting_point = 1;
 		strncpy(rkey, &key[1], MAXTOKEN-1);
@@ -307,8 +307,6 @@ struct graph *pjk_read(struct graph *g, char *filename) {
 	fp = Fopen(filename, "r");
 	while (1) {
 		reinit_vars();
-		printf("%s\n", buffer);
-
 		lineno++;
 		eof = input_ln();
 		if (eof) break;
@@ -325,8 +323,11 @@ struct graph *pjk_read(struct graph *g, char *filename) {
 	}
 	Fclose(fp);
 
-	/* a particle may stay at the same place */
+	/* a walker may stay at the same place */
 	graph_self_loops_add(g);
+
+        if (flags['v'])
+                graph_print(g);
 
 	return g;
 }
