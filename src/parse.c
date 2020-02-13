@@ -326,9 +326,6 @@ struct graph *pjk_read(struct graph *g, char *filename) {
 	/* a walker may stay at the same place */
 	graph_self_loops_add(g);
 
-        if (flags['v'])
-                graph_print(g);
-
 	return g;
 }
 
