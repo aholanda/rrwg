@@ -41,10 +41,14 @@ void graph_assign_function(struct graph *g, char*name) {
        strncpy(g->funcname, name, MAXTOKEN);
 }
 void graph_init_walkers(struct graph*g, int nwalkers) {
+        int i;
+
         assert(nwalkers>1);
 
         g->w = nwalkers;
         g->walkers = CALLOC(g->w, sizeof(struct walker));
+        for (i=0; i<g->w; i++)
+                snprintf(g->walkers[i].name, MAXTOKEN, "walker%d", i+1);
 }
 
 static struct vertex *vertex_lookup(struct graph*g, char *name) {

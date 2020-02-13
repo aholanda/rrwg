@@ -5,18 +5,19 @@
 #include "rrwg.h"
 
 /*
-  Sum all visits (steps) occurred in the neighbors of v for all walkers.
+  Sum all visits (steps) occurred in the neighbors of v for one walker.
+  The number of steps must be equal for all walkers.
 */
 static int sum_all_visits_of_v_mates(struct graph*g,
                                      struct vertex*v) {
 	struct vertex *x;
 	struct arc *a;
-	int i, sum;
+	int sum;
 
 	for (sum=0, a=v->arcs; a; a=a->next) {
 		x = a->tip;
-		for (i=0; i<g->w; i++)
-			sum += x->visits[i];
+                /* Arbitrary choice: 0  */
+		sum += x->visits[0];
 	}
 	return sum;
 }
@@ -28,7 +29,7 @@ static int sum_all_visits_of_v_mates(struct graph*g,
 static double calc_repellency(struct graph*g, struct vertex *v,
 			      int idx, int allvisits) {
 	int i; /* counter */
-	double sum=0.0; /* repelling coefficient */
+	double sum=0.0;
 
 	assert(g->w>idx);
 
@@ -49,10 +50,9 @@ static double calc_total_repellency(struct graph*g, struct vertex *v,
                                    int walker_idx, int allvisits) {
         struct vertex *x; /* v mate */
         struct arc *a;
-        double sum=0.0; /* denominator and numerator */
-        int i;
+        double sum=0.0;
 
-	for (i=0, a=v->arcs; a; a=a->next, i++) {
+	for (a=v->arcs; a; a=a->next) {
 		x = a->tip;
 		x->repel = calc_repellency(g, x, walker_idx, allvisits);
                 sum += x->repel;
@@ -66,12 +66,11 @@ static double calc_total_repellency(struct graph*g, struct vertex *v,
 */
 static struct vertex *choose_next_destination(struct graph*g,
 					      int idx, int time) {
-	struct vertex *v=NULL, *x=NULL;
+	struct vertex *v, *x;
 	struct arc *a;
-        struct walker *w=NULL;
-	double cum=0.0, r=2.0; /* cummulative sum and random number */
-        int i; /* general-purpose counter */
-	int allvisits=0; /* all visits in the neighborhood of v */
+        struct walker *w;
+	double cum=0.0, r; /* cummulative sum and random number */
+	int allvisits; /* all visits in the neighborhood of v */
    	double one; /* total coefficient repelling used to normalize rv */
 
         w = &g->walkers[idx];
@@ -84,14 +83,27 @@ static struct vertex *choose_next_destination(struct graph*g,
 
         /* generate a fractional random number between 0.0 and 1.0 */
 	r = ( (double)rand() / (double)RAND_MAX );
-        /* Normalize random number */
-        r = r * one;
-	for (i=0, a=v->arcs; a; a=a->next, i++) {
+	for (a=v->arcs; a; a=a->next) {
                 x = a->tip;
-                cum += x->repel; //x->repel;
+                /* Normalize repellency and
+                  accumulate it to find the range
+                   in which r is in. */
+                cum += x->repel/one;
+                /* When r is lesser than summation, the range is found. */
                 if (r < cum)
                         break;
 	}
+        /* Verbose mode */
+        if (flags['v']) {
+                struct vertex *xx;
+                printf("\t%s:", w->name);
+        	for (a=v->arcs; a; a=a->next) {
+                        xx = a->tip;
+                        printf(" Pr(%s)=%1.3f",
+                                xx->name, xx->repel/one);
+                }
+                printf(" rand=%1.3f choice=%s\n", r, x->name);
+        }
 	return x;
 }
 
@@ -110,10 +122,9 @@ void walk(struct graph *g) {
 
 	go_to = (struct vertex**)CALLOC(g->w, sizeof(struct vertex*));
 	for (t=0; t<g->maxsteps; t++) {
-		for (i=0; i<g->w; i++) {
+		for (i=0; i<g->w; i++)
 			go_to[i] = choose_next_destination(g, i, t);
-                        printf("%d chooses %s\n", i, go_to[i]->name);
-		}
+
 		/* Set the walkers next step */
 		for (i=0; i<g->w; i++) {
 			w = &g->walkers[i];

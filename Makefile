@@ -22,8 +22,8 @@ trash += rrwg.1
 clean:
 	$(RM) -r $(trash)
 
-checkalloc: rrwg
-	valgrind -v --leak-check=full --track-origins=yes ./$<
+checkalloc: rrwg example0.net
+	valgrind -v --leak-check=full --track-origins=yes ./$^
 
 install: rrwg rrwg.1
 	@install rrwg $(PREFIX)/bin

@@ -1,6 +1,6 @@
 # C
-alpha=2.1
-function=geom
+alpha=4.1
+function=exp
 maxsteps=3
 walkers=2
 
