@@ -29,7 +29,7 @@ static int sum_all_visits_of_v_mates(struct graph*g,
   (walker index) in the vertex v.
 */
 static double calc_repellency(struct graph*g, struct vertex *v,
-			      int idx, int allvisits) {
+			      int idx, int allvisits, double b) {
 	int i; /* counter */
 	double sum=0.0;
 
@@ -44,8 +44,7 @@ static double calc_repellency(struct graph*g, struct vertex *v,
 	  but pidx.
 	  - The denominator is the normalized visits of all walkers.
 	*/
-	return g->func(sum, g->w, g->alpha,
-                        (double)v->visits[idx]/allvisits);
+	return g->func(sum, g->w, g->alpha, b);
 }
 
 static double calc_total_repellency(struct graph*g, struct vertex *v,
@@ -53,10 +52,12 @@ static double calc_total_repellency(struct graph*g, struct vertex *v,
         struct vertex *x; /* v mate */
         struct arc *a;
         double sum=0.0;
+        double b; /* Multiplicative constant */
 
+        b = (double)v->visits[walker_idx]/allvisits;
 	for (a=v->arcs; a; a=a->next) {
 		x = a->tip;
-		x->repel = calc_repellency(g, x, walker_idx, allvisits);
+		x->repel = calc_repellency(g, x, walker_idx, allvisits, b);
                 sum += x->repel;
 	}
         return sum;
