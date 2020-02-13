@@ -105,7 +105,7 @@ extern void graph_init_walkers(struct graph*, int nwalkers);
 extern void graph_set_name(struct graph*, char*name);
 extern struct vertex *graph_vertex_add(struct graph*, char *name);
 extern struct arc *graph_edge_add(struct graph*, char *from, char *to);
-extern void graph_print(struct graph*);
+extern void graph_print(struct graph*, FILE*);
 extern void graph_self_loops_add(struct graph*);
 extern void graph_free(struct graph*);
 extern void graph_visits_set(struct graph*,
