@@ -1,7 +1,7 @@
 # C
-alpha=4.1
+alpha=2
 function=exp
-maxsteps=3
+maxsteps=300
 walkers=2
 
 * Vertices

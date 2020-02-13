@@ -41,14 +41,19 @@ void graph_assign_function(struct graph *g, char*name) {
        strncpy(g->funcname, name, MAXTOKEN);
 }
 void graph_init_walkers(struct graph*g, int nwalkers) {
+        struct walker *w;
         int i;
 
         assert(nwalkers>1);
+        assert(g->maxsteps>0);
 
         g->w = nwalkers;
         g->walkers = CALLOC(g->w, sizeof(struct walker));
-        for (i=0; i<g->w; i++)
-                snprintf(g->walkers[i].name, MAXTOKEN, "walker%d", i+1);
+        for (i=0; i<g->w; i++) {
+                w = &g->walkers[i];
+                snprintf(w->name, MAXTOKEN, "walker%d", i+1);
+                w->path = CALLOC(g->maxsteps+1, sizeof(struct vertex*));
+        }
 }
 
 static struct vertex *vertex_lookup(struct graph*g, char *name) {
@@ -74,10 +79,14 @@ struct vertex *graph_vertex_add(struct graph*g, char *name) {
 
 	v = vertex_lookup(g, name);
 	if (!v) {
+                assert(g->w > 1);
 		v = &g->vertices[g->n++];
 		strncpy(v->name, name, MAXTOKEN);
 		v->arcs = NULL;
                 v->repel = 0.0;
+                // Allocate memory to store the visits by the walkers
+                // in the vertices
+                v->visits = CALLOC(g->w, sizeof(struct walker*));
 	}
 	return v;
 }
@@ -133,8 +142,11 @@ void graph_self_loops_add(struct graph *g) {
 	}
 }
 
-
-void graph_visits_set(struct graph*g,
+/*
+  Increment the number of visits of walker w in
+  the vertex v by nvisits.
+*/
+void graph_visits_incr(struct graph*g,
 		        struct vertex*v,
 		        struct walker*w,
                         int time,
@@ -147,13 +159,7 @@ void graph_visits_set(struct graph*g,
 	assert(idx>=0);
         assert(nvisits>0);
 
-        if (v->visits==NULL)
-                v->visits = CALLOC(g->w, sizeof(struct walker*));
-
-        if (w->path==NULL)
-                w->path = CALLOC(g->maxsteps+1, sizeof(struct vertex*));
-
-	v->visits[idx] = nvisits;
+	v->visits[idx] += nvisits;
 }
 
 void graph_visit(struct graph*g, struct vertex*v,
@@ -161,7 +167,7 @@ void graph_visit(struct graph*g, struct vertex*v,
 	assert(g);
 	assert(v);
 
-        graph_visits_set(g, v, w, time, 1);
+        graph_visits_incr(g, v, w, time, 1);
         w->path[time] = v;
 }
 

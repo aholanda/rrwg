@@ -94,7 +94,7 @@ static void check_constraints(struct graph *g) {
                 for (j=0; j<g->n; j++) {
                         v = &g->vertices[j];
                         if (v->visits[i] == 0)
-                                graph_visits_set(g, v, w, 0, DEFAULT_STEPS0);
+                                graph_visits_incr(g, v, w, 0, DEFAULT_STEPS0);
 
                          allvisits0[i] += v->visits[i];
                  }
@@ -134,7 +134,7 @@ static INLINE void context_switch(struct graph*g) {
 		break;
 	case VERTEX: /* Vertex section was completed */
                 check_constraints(g);
-  		break;
+    		break;
 	default:
 		break;
 	}
@@ -227,9 +227,9 @@ static void scan_graph_keyval(struct graph*g) {
 
 	/* All parameters were parsed. */
 	if (nparms_count == NPARMS) {
+                g->maxsteps =  maxsteps;
 		graph_init_walkers(g, nwalkers);
 		g->alpha = alpha;
-	        g->maxsteps =  maxsteps;
 		graph_assign_function(g, funcname);
 		parms_ok = 1;
 	}
@@ -258,7 +258,7 @@ static void scan_vertex_keyval(struct graph*g, struct vertex*v) {
 
 	pidx = atoi(rkey) - 1;
 	w = &g->walkers[pidx];
-	graph_visits_set(g, v, w, 0, atoi(val));
+	graph_visits_incr(g, v, w, 0, atoi(val));
 	if (is_starting_point)
 			w->path[0] = v;
 }

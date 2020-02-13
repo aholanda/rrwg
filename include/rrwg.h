@@ -108,7 +108,7 @@ extern struct arc *graph_edge_add(struct graph*, char *from, char *to);
 extern void graph_print(struct graph*, FILE*);
 extern void graph_self_loops_add(struct graph*);
 extern void graph_free(struct graph*);
-extern void graph_visits_set(struct graph*,
+extern void graph_visits_incr(struct graph*,
 						struct vertex*,
 						struct walker*,
 						int time,
