@@ -1,6 +1,7 @@
 .editorconfig
 .gdbinit
 rrwg
+rrwg.1
 .vscode
 *.dat
 *.o
