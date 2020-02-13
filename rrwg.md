@@ -1,6 +1,6 @@
 % RRWG(1)
-% Adriano J. Holanda
-% 2019-12-17 v0.3 rrwg man page
+% Adriano J. Holanda developed the program. Rafael Rosales proposed the idea and helped in the simulation design
+% 2020-02-13 v0.1 rrwg man page
 
 # NAME
 
@@ -8,40 +8,37 @@ rrwg - simulate repelling random walks on graphs
 
 # SYNOPSIS
 
-rrwg [-b] [+s] [+l] infile[.net] [outfile.dat]
+rrwg [-b] [+v] filename.net
 
 # DESCRIPTION
 
 *rrwg* simulates the the repelling random walks on graphs using
-dotfile[.gv] as input in a simplified graphviz dot format. The
-outfile[.dat] is optional because the program use the prefix file name
-dotfile if the output file is ommited.
+"filename.net" as input in a simplified Pajek-like format. After
+ the walks are completed, "filename.dat" is generated with the
+ walkers' path in terms of vertices. A R file called "filename.R"
+ is also created with commands to plot the data.
 
 # COMMAND-LINE OPTIONS
 -b
 : suppress the banner line printed when rrwg starts the execution.
 
-+l
-: generate a file named "outfile.log" with the execution trace in terms of visits.
-
-+s
-: show the statistics of execution after the program is finished.
++v
+: increase the verbosity.
 
 # EXAMPLES OF INPUT FILE CONTENT
 
 ````
-# BEGIN OF FILE
+# BEGIN OF FILE "complete.net"
 # Comments comes after #
 # Two walkers' repelling random walks on the 3-complete graph.
-name=complete
 alpha=0.45
 function=exp
 max_steps=1000
 walkers=2
 
 * Vertices
-a *1=1 2=10
-b *2=10
+a @1=1 2=10
+b @2=10
 c
 
 * Edges
@@ -50,15 +47,15 @@ b -- c
 a -- c
 # END OF FILE
 
-# BEGIN OF FILE
+# BEGIN OF FILE "incomplete.net"
 alpha=0.75;
 function=geom;
 max_steps=5;
 walkers=2;
 
 * Vertices
-a *1=100
-b 1=18 *2=50
+a @1=33
+b 1=18 @2=50
 c
 d
 
@@ -82,14 +79,11 @@ indicates the transitivity. All edges starts after the string
 
 The undirected graph called "incomplete" has four vertices {a, b, c,
 d} and four edges {{a, b}, {b, c}, {a, c}, {b, d}}. At time 0, the
-vertex \f[C]a\f[] was visited 100 times by walker 1 and b 18 times
+vertex "a" was visited 33 times by walker 1 and b 18 times
 by walker 1 and 50 by 2.  When the assignment is omitted like in the
 vertices {c, d}, one visit is assigned by default.
 
 The following fields are recognized:
-
-name /[optional]/
-: The name of the graph.
 
 function
 : The function used to calculate the repelling index, values may be "exp" that stands for exponential and
@@ -112,17 +106,14 @@ walkers
 : number of walkers to simulate
 
 ````
-a *1=10 2=5
-b
+a @1=10 @2=11
+b 1=2
 ````
 
-Example on how to assign 10 visits already walked to walker 1 that
-starts at vertex "a".  In the same vertex "a", the walker 2 has
-visited 5 times before the begin of simulation. The walkers are
-separated by space. The asterisk "*" indicates the starting point of
+Example on how to assign 10 visits already walked to walker "1" that
+starts at vertex "a".  In the same vertex "a", the walker "2" has
+visited 11 times before the begin of simulation. The walkers are
+separated by space. The at "@" indicates the starting point of
 walker identified by walker_id.  When the number of visits is
-omitted, the value one is assigned by default.
-
-# AUTHORS
-Adriano J. Holanda developed the program. Rafael Rosales proposed the
-idea and helped in the simulation design.
+omitted, the value 1 (one) is assigned by default. The number
+of steps given by each walker at time zero must be equal.
