@@ -184,36 +184,38 @@ INLINE void graph_free(struct graph *g) {
 	}
 }
 
-void graph_print(struct graph*g) {
+void graph_print(struct graph*g, FILE *f) {
 	struct vertex *v, *x;
 	struct arc *a;
         struct walker *w;
 	int i, j;
         char loc;
 
-        fprintf(stderr, "* Parameters\n");
-        fprintf(stderr, "alpha=%2.3f\n", g->alpha);
-        fprintf(stderr, "function=%s\n", g->funcname);
-        fprintf(stderr, "maxsteps=%d\n", g->maxsteps);
-        fprintf(stderr, "walkers=%d\n", g->w);
+        if (f==NULL)
+                f = stdout;
 
-	fprintf(stderr, "* Graph(V, E)=%s(%d, %d)\n", g->name, g->n, g->m);
+        fprintf(f, "* Parameters\n");
+        fprintf(f, "alpha=%2.3f\n", g->alpha);
+        fprintf(f, "function=%s\n", g->funcname);
+        fprintf(f, "maxsteps=%d\n", g->maxsteps);
+        fprintf(f, "walkers=%d\n", g->w);
+        fprintf(f, "* Graph(V, E)=%s(%d, %d)\n", g->name, g->n, g->m);
 	for (i=0; i<g->n; i++) {
 		v = &g->vertices[i];
-		fprintf(stderr, "%s:", v->name);
+		fprintf(f, "%s:", v->name);
 		for (a=v->arcs; a; a=a->next){
 			x = a->tip;
-			fprintf(stderr, " %s", x->name);
+			fprintf(f, " %s", x->name);
 		}
-		fprintf(stderr, ";");
+		fprintf(f, ";");
 		for (j=0; j<g->w; j++) {
                         loc = ' ';
                         w = &g->walkers[j];
                         if (w->path[0]==v)
                                 loc = '@';
-			fprintf(stderr, " %cvisits(walker%d, t0)=%d", loc, j+1, v->visits[j]);
+			fprintf(f, " %cvisits(walker%d, t0)=%d", loc, j+1, v->visits[j]);
                 }
 
-		fprintf(stderr, "\n");
+		fprintf(f, "\n");
 	}
 }
