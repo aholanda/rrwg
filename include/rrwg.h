@@ -58,9 +58,9 @@ __attribute__((always_inline))
 struct vertex {
 	char name[MAXTOKEN];
 	struct arc *arcs;
-	/* array of visits by particle, it is dinamically allocated. */
+	/* array of visits by walker, it is dinamically allocated. */
 	int *visits;
-        /* Repellency for some particle */
+        /* Repellency for some walker */
         double repel;
 };
 

@@ -22,8 +22,8 @@ static int sum_all_visits_of_v_mates(struct graph*g,
 }
 
 /*
-  Assess the repelling coefficient for all particles other than pidx
-  (particle index) in the vertex v.
+  Assess the repelling coefficient for all walkers other than pidx
+  (walker index) in the vertex v.
 */
 static double calc_repellency(struct graph*g, struct vertex *v,
 			      int idx, int allvisits) {
@@ -37,9 +37,9 @@ static double calc_repellency(struct graph*g, struct vertex *v,
 			sum += (double)v->visits[i]/allvisits;
 	/*
 	  All visits are in te same vertex:
-	  - The numerator is the normalized visits of all particles
+	  - The numerator is the normalized visits of all walkers
 	  but pidx.
-	  - The denominator is the normalized visits of all particles.
+	  - The denominator is the normalized visits of all walkers.
 	*/
 	return g->func(sum, g->w, g->alpha,
                         (double)v->visits[idx]/allvisits);
@@ -61,7 +61,7 @@ static double calc_total_repellency(struct graph*g, struct vertex *v,
 }
 
 /*
-  Choose the next location to be visited by particle p with index
+  Choose the next location to be visited by walker p with index
   pidx.
 */
 static struct vertex *choose_next_destination(struct graph*g,
@@ -99,7 +99,7 @@ void walk(struct graph *g) {
 	struct walker *w;
 	int i, t; /* counters */
 	static time_t tm;
-	/* Array indexed by particle id to mark next vertex to be
+	/* Array indexed by walker id to mark next vertex to be
 	 * visited. */
 	struct vertex **go_to;
 

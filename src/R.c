@@ -47,9 +47,9 @@ static void R_plot(struct graph *g, int walker_idx) {
 		(walker_idx * g->n) + 1, colors[0], "n", "%visits", g->maxsteps);
 }
 
-static void R_line(struct graph *g, int particle_idx, int vertex_idx) {
+static void R_line(struct graph *g, int walker_idx, int vertex_idx) {
 	FPRINTF ("lines(data[,%d], col=\"%s\", lwd=2)\n",
-		 (particle_idx * g->n) + (vertex_idx + 1), colors[vertex_idx % NSTYLES]);
+		 (walker_idx * g->n) + (vertex_idx + 1), colors[vertex_idx % NSTYLES]);
 
 }
 
