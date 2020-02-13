@@ -4,6 +4,8 @@
 
 #include "rrwg.h"
 
+extern FILE *log_file;
+
 /*
   Sum all visits (steps) occurred in the neighbors of v for one walker.
   The number of steps must be equal for all walkers.
@@ -93,16 +95,16 @@ static struct vertex *choose_next_destination(struct graph*g,
                 if (r < cum)
                         break;
 	}
-        /* Verbose mode */
-        if (flags['v']) {
+        /* Log mode */
+        if (flags['l']) {
                 struct vertex *xx;
-                printf("\t%s:", w->name);
+                fprintf(log_file, "\t%s:", w->name);
         	for (a=v->arcs; a; a=a->next) {
                         xx = a->tip;
-                        printf(" Pr(%s)=%1.3f",
+                        fprintf(log_file, " Pr(%s)=%1.3f",
                                 xx->name, xx->repel/one);
                 }
-                printf(" rand=%1.3f choice=%s\n", r, x->name);
+                fprintf(log_file, " rand=%1.3f choice=%s\n", r, x->name);
         }
 	return x;
 }
