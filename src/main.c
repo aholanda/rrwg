@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "rrwg.h"
 
@@ -8,6 +9,10 @@ float version=0.1;
 
 /* Output file name in CSV-like format. */
 char dat_file_name[MAXFN];
+/* Log file name where the traces are written. */
+char log_file_name[MAXFN];
+/* Pointer to log file. */
+FILE *log_file;
 /* Input file name in Pajek-like format. */
 char net_file_name[MAXFN];
 /* Flags passed to the program. */
@@ -25,14 +30,14 @@ static void show_usage_and_exit(char **av) {
         fprintf(stderr, "usage: %s [-b+v] infile.net\n", av[0]);
         fprintf(stderr, "where:\n");
         fprintf(stderr, "\t-b:\tsupress the banner;\n");
-        fprintf(stderr, "\t+v:\tincrease verbosity.\n");
+        fprintf(stderr, "\t+l:\twrite the walk trace into \"infile.log\".\n");
         exit(EXIT_FAILURE);
 }
 
-static void show_banner(char **av) {
+static void show_banner(char *progname) {
         if (flags['b'])
                 fprintf(stderr, "* This is %s version %2.2f\n",
-                        av[0], version);
+                        progname, version);
 }
 
 static void eval_arg(char *a, char on_off) {
@@ -62,6 +67,19 @@ static Boolean scan_args(int ac, char**av) {
         return ok;
 }
 
+static void open_log_file(char *prefix) {
+        char buff[100];
+        time_t now = time (0);
+
+        /* Append the extension to graph name */
+        snprintf(log_file_name, MAXFN, "%s%s", prefix, ".log");
+        log_file = Fopen(log_file_name, "w");
+
+        /* Write the current datetime as head */
+        strftime(buff, 100, "%Y-%m-%d %H:%M:%S", localtime (&now));
+        fprintf(log_file, "# Created at %s\n", buff);
+}
+
 int main(int argc, char **argv) {
 	struct graph *g;
         Boolean go_on = FALSE;
@@ -70,17 +88,27 @@ int main(int argc, char **argv) {
         go_on = scan_args(argc, argv);
         if (!go_on)
                 show_usage_and_exit(argv);
-        show_banner(argv);
+        show_banner(argv[0]);
 
 	g = graph_new();
-
 	g = pjk_read(g, net_file_name);
 
+        if (flags['l'])
+                open_log_file(g->name);
+        graph_print(g, log_file);
+
+        /* RANDOM WALKS */
 	walk(g);
 
+        /* RESULTS */
         data_fwrite(g);
+        /* SCRIPT TO GENERATE THE PLOT */
 	R_fwrite_script(g);
 
+        if (flags['l']) {
+                Fclose(log_file);
+                fprintf(stderr, "* Wrote %s\n", log_file_name);
+        }
 	graph_free(g);
 
 	return EXIT_SUCCESS;
