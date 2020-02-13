@@ -26,7 +26,7 @@ checkalloc: rrwg
 	valgrind -v --leak-check=full --track-origins=yes ./$<
 
 install: rrwg rrwg.1
-	@install rwg $(PREFIX)/bin
+	@install rrwg $(PREFIX)/bin
 	@install rrwg.1 $(PREFIX)/man/man1
 	@echo "Successfully installed!"
 
