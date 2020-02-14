@@ -8,7 +8,7 @@ VPATH = src:include
 rrwg: alloc.o data.o graph.o io.o main.o parse.o R.o walk.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
-trash += rrwg
+trash += rrwg *.dat *.log *.pdf *.R
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) -o $@ $<
