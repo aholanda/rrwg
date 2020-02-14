@@ -75,7 +75,8 @@ struct walker {
 };
 
 struct graph {
-	char name[MAXTOKEN]; /* name of the graph */
+	/* Graph receives the name of the input file. */
+	char name[MAXFN]; /* name of the graph */
 	struct vertex vertices[MAXN];
 	int n, m; /* number of vertices, arcs */
 	struct arc area[MAXM];
