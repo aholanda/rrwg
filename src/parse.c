@@ -276,7 +276,7 @@ static void scan_vertex(struct graph *g) {
 }
 
 static void scan_edge(struct graph *g) {
-	fill_buffer_up_to(key, EDGE); /* from vertex */
+	fill_buffer_up_to(key, EDGE_SEP); /* source vertex */
 	cp += 2; /* skip '--' on "a -- b" edge*/
 	skip_spaces();
 	fill_buffer_up_to(val, SPACE); /* to vertex */
