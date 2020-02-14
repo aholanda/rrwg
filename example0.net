@@ -1,12 +1,12 @@
-# C
-alpha=4.0
-function=geom
-maxsteps=10
+# Comments
+alpha=2.1
+function=exp
+maxsteps=100
 walkers=2
 
 * Vertices
 a @1=10
-b 1=20 @2=30
+b 1=10 @2=20
 c 1=2
 
 * Edges
