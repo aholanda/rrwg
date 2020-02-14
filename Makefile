@@ -1,3 +1,4 @@
+CC := gcc
 CFLAGS := -Wall -I./include -g
 LDFLAGS := -lm
 PREFIX := /usr/local
