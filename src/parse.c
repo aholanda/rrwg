@@ -163,6 +163,7 @@ static void fill_buffer_up_to(char buf[], enum tokcat stop) {
 
 	case EDGE_SEP:
 		cmp=&cmp1;
+                break;
 	default:
 		fprintf(stderr, "%s:%d Unknown token..",
                         net_file_name, lineno);
@@ -178,6 +179,11 @@ static void fill_buffer_up_to(char buf[], enum tokcat stop) {
 		if (cmp((int)*cp)) {
 			break;
 		}
+                if (isspace(*cp)) { /* ignore spaces=concatenate */
+                        cp++;
+                        continue;
+                }
+
 		*rcp++ = *cp++;
 	}
 	cp++, *rcp = '\0'; /* skip stop token and close key */
