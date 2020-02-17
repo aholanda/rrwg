@@ -18,17 +18,15 @@ static char buf[BUFLEN]; /* local buffer */
 #define NSTYLES 3
 static char*colors[NSTYLES]= {"red", "black", "dark blue"};
 
-static char filename[MAXFN]; /* Output file name where the commands to plot are written. */
 static FILE *file; /* File to write the commands to plot the curves. */
+extern char R_file_name[MAXFN]; /* Output file name where the commands to plot are written. */
 
-static struct {
-	int x;
-	double y;
-} max;
+static void R_output_format(char*prefix) {
+        static char fn[MAXFN];
+        char *fmt="pdf";
 
-static void assign_max(struct graph *g) {
-	max.x = g->maxsteps;
-	max.y = 1.0;
+        snprintf(fn, BUFLEN, "%s('%s.%s')", fmt, prefix, fmt);
+        FPRINTF("%s\n", fn);
 }
 
 static void R_load_data(struct graph *g) {
@@ -40,26 +38,20 @@ static void R_load_data(struct graph *g) {
 }
 
 static void R_plot(struct graph *g, int walker_idx) {
-        FPRINTF("ymin <- min(data[,%d:%d])\n", (walker_idx*g->n)+1, (walker_idx+1)*g->n);
-        FPRINTF("ymax <- max(data[,%d:%d])\n", (walker_idx*g->n)+1, (walker_idx+1)*g->n);
-	FPRINTF("plot(data[,%d], col=\"%s\", type=\"l\", lwd=2, xlab=\"%s\", ylab=\"%s\", \
+        FPRINTF("x <- seq(1,xmax)\n");
+        FPRINTF("ymin <- min(data[,%d:%d]/x)\n", (walker_idx*g->n)+1, (walker_idx+1)*g->n);
+        FPRINTF("ymax <- max(data[,%d:%d]/x)\n", (walker_idx*g->n)+1, (walker_idx+1)*g->n);
+	FPRINTF("plot(data[,%d]/x, col=\"%s\", type=\"l\", lwd=2, xlab=\"%s\", ylab=\"%s\", \
                        xlim=c(0,%d), ylim=c(ymin,ymax))\n",
 		(walker_idx * g->n) + 1, colors[0], "n", "%visits", g->maxsteps);
 }
 
 static void R_line(struct graph *g, int walker_idx, int vertex_idx) {
-	FPRINTF ("lines(data[,%d], col=\"%s\", lwd=2)\n",
+	FPRINTF ("lines(data[,%d]/x, col=\"%s\", lwd=2)\n",
 		 (walker_idx * g->n) + (vertex_idx + 1), colors[vertex_idx % NSTYLES]);
 
 }
 
-/*
-  Fill buf[] array with the command to set plot title, xlabel and
-  ylabel in R. The function used for this task is as follows:
-
-  title(main="main title", sub="sub-title",
-  xlab="x-axis label", ylab="y-axis label")
-*/
 static void R_legend(struct graph *g) {
         int i;
 
@@ -89,12 +81,11 @@ static void R_end() {
 void R_fwrite_script(struct graph *g) {
 	int i, j;
 
-	strncpy(filename, g->name, MAXFN);
-	append_suffix(filename, ".R");
-	file = Fopen(filename, "w");
+	strncpy(R_file_name, g->name, MAXFN);
+	append_suffix(R_file_name, ".R");
+	file = Fopen(R_file_name, "w");
 
-	assign_max(g);
-
+        R_output_format(g->name);
 	R_load_data(g);
 	for (i = 0; i < g->w; i++) {
 		R_plot(g, i);
@@ -105,5 +96,5 @@ void R_fwrite_script(struct graph *g) {
 	R_end();
 
 	Fclose(file);
-	fprintf(stderr, "* Wrote %s\n", filename);
+	fprintf(stderr, "* Wrote %s\n", R_file_name);
 }
