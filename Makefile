@@ -15,6 +15,8 @@ trash += rrwg *.dat *.log *.pdf *.R
 
 trash += *.o
 
+man: rrwg.1
+
 rrwg.1: rrwg.md
 	pandoc -s -t man $< -o $@
 
