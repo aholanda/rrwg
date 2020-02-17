@@ -1,7 +1,7 @@
 # Comments
-alpha=2.1
+alpha=10.0
 function=exp
-maxsteps=100
+maxsteps=1500
 walkers=2
 
 * Vertices
