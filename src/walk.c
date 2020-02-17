@@ -64,7 +64,7 @@ static double calc_total_repellency(struct graph*g, struct vertex *v,
 }
 
 /*
-  Choose the next location to be visited by walker p with index
+  Choose the next location to be visited by the walker with index
   pidx.
 */
 static struct vertex *choose_next_destination(struct graph*g,
@@ -92,11 +92,11 @@ static struct vertex *choose_next_destination(struct graph*g,
                   accumulate it to find the range
                    in which r is in. */
                 cum += x->repel/one;
-                /* When r is lesser than summation, the range is found. */
+                /* When r is lower than summation, the range is found. */
                 if (r < cum)
                         break;
 	}
-        /* Log mode */
+        /* Log flag is enabled */
         if (flags['l']) {
                 struct vertex *xx;
                 fprintf(log_file, "\t%s:", w->name);
