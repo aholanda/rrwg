@@ -11,10 +11,12 @@ float version=0.1;
 char dat_file_name[MAXFN];
 /* Log file name where the traces are written. */
 char log_file_name[MAXFN];
-/* R script file name, used to plot the data */
-char R_file_name[MAXFN];
 /* Pointer to log file. */
 FILE *log_file;
+/* R script file name, used to plot the data */
+char R_file_name[MAXFN];
+/* Pointer to R script file */
+FILE *R_file;
 /* Input file name in Pajek-like format. */
 char net_file_name[MAXFN];
 /* Flags passed to the program. */
