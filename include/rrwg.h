@@ -125,7 +125,7 @@ extern void graph_vertex_visit(struct graph*, struct vertex*v,
 /* graph.c */
 
 /* IO.C */
-#define BUFLEN 256
+#define BUFLEN 512
 extern FILE *Fopen(char *filename, const char *mode);
 extern void Fclose(FILE *fp)
 #ifdef GNUC
