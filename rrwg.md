@@ -22,8 +22,8 @@ rrwg [-b] [+v] filename.net
 -b
 : suppress the banner line printed when rrwg starts the execution.
 
-+v
-: increase the verbosity.
++l
+: create a file named 'filename.log' with each walkers' next step decision.
 
 # EXAMPLES OF INPUT FILE CONTENT
 
