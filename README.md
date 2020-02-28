@@ -18,10 +18,10 @@ Dijkstra (1972) [E. W. Dijkstra, "Structured Programming", 1972]:
 {input,walks,output}
 ````
 
-There are also [wrappers](src/wrapper.c) subroutines to help in the
+There are also [wrapper](src/wrapper.c) subroutines to help in the
 use of subroutines from C standard library. They provide an uniform
-mechanism to check errors or call a second subroutine but the
-additional computation is minimal.
+mechanism to check errors after a call to a second subroutine with little
+additional computation.
 
 ### Input
 
@@ -34,9 +34,9 @@ the edges are path among these points.
 ### Walks
 
 The objects that perform the [walks](src/walk.c) are named walkers.
-The vertices are visited by walkers that chooses the next vertex to be
-visited according to the number of other walkers visits. Each walker
-is repelled by others, that is the next vertex to be visited has
+The vertices are visited by walkers that choose the next vertex to be
+visited according to the number of other walkers' visits. Each walker
+is repelled by the others, that is the next vertex to be visited has
 probability inversely proportional to the number of visits of the
 other walkers in it. Self-loops are created by default because the
 vertex can stay at the same place to the next interaction.
