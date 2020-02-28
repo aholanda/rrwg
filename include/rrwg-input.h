@@ -1,6 +1,9 @@
 #ifndef RRWG_INPUT_H
 #define RRWG_INPUT_H
 
+/* Input file name in Pajek-like format. */
+extern char net_file_name[MAXFN];
+
 /* Read file name in Pajek format and return the graph described in
  * it.
  */

@@ -7,8 +7,6 @@
 
 #define DATA_SEP ";"
 
-extern char dat_file_name[MAXFN];
-
 #define TITLE "Random Repelling Walks on Graphs"
 #define XLAB "time"
 #define YLAB "visits"
@@ -16,8 +14,11 @@ extern char dat_file_name[MAXFN];
 #define NSTYLES 3
 static char*colors[NSTYLES]= {"red", "black", "dark blue"};
 
-extern FILE *R_file; /* File to write the commands to plot the curves. */
-extern char R_file_name[MAXFN]; /* Output file name where the commands to plot are written. */
+static char dat_file_name[MAXFN];
+/* Output file name where the commands to plot are written. */
+static char R_file_name[MAXFN];
+/* File to write the commands to plot the curves. */
+static FILE *R_file;
 
 void data_fwrite(struct graph *g) {
 	FILE *file;

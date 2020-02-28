@@ -9,13 +9,26 @@
 /* Symbol to indicate the vertex where the walker starts at. */
 #define LOCSYM '@'
 
+/*
+  In our simple lexer, only 3 categories are needed:
+  ASSIGN: to mark an assignment in the input file;
+  EDGE_SEP: to mark the start of set of symbols that
+  are used to connect vertices forming edges;
+  SPACE: any space or control character.
+*/
 enum tokcat {ASSIGN, EDGE_SEP, SPACE};
-
-extern char flags[128];
 
 static enum context ctx;
 
-static FILE *fp; /* current file pointer */
+/*
+   Input file name in Pajek-like format. The name of the input file
+   is used to name the graph.
+*/
+char net_file_name[MAXFN];
+/* File pointer to graph description */
+static FILE *net_file;
+
+/* Data */
 static char buffer[BUFLEN]; /* general-purpose buffer */
 static char *cp, *rcp; /* current character and replica of current character */
 static int lineno; /* line number of current line */
@@ -58,7 +71,7 @@ static int input_ln(void) {
 	reinit_cp();
 	reinit_keyval(); /* put only to facilitate debug */
 	while(1) {
-		*cp = fgetc(fp);
+		*cp = fgetc(net_file);
 		if (*cp=='\n'){
 			*cp = '\0';
 			break;
@@ -311,7 +324,7 @@ static void eval(struct graph *g) {
 struct graph *pjk_read(struct graph *g, char *filename) {
 	int eof = 0;
 
-	fp = Fopen(filename, "r");
+	net_file = Fopen(filename, "r");
 	while (1) {
 		reinit_vars();
 		lineno++;
@@ -328,7 +341,7 @@ struct graph *pjk_read(struct graph *g, char *filename) {
 		}
 		eval(g);
 	}
-	Fclose(fp);
+	Fclose(net_file);
 
 	/* a walker may stay at the same place */
 	graph_self_loops_add(g);

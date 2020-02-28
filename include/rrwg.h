@@ -13,14 +13,11 @@
 typedef short Boolean;
 enum Boolean_enum {FALSE, TRUE};
 
-extern char flags[128];
-extern char dat_file_name[MAXFN];
-extern char net_file_name[MAXFN];
-
+#include "rrwg-wrapper.h"
 #include "rrwg-input.h"
 #include "rrwg-graph.h"
 #include "rrwg-output.h"
-#include "rrwg-wrapper.h"
+#include "rrwg-main.h"
 
 #define NPARMS 4
 extern void walk(struct graph*);
