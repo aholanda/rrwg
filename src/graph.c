@@ -6,13 +6,13 @@
 #include "rrwg.h"
 
 struct graph *graph_new() {
-        struct graph *g;
+	struct graph *g;
 	g = CALLOC(1, sizeof(struct graph));
 	return g;
 }
 
 void graph_set_name(struct graph *g, char *name) {
-        assert(g);
+	assert(g);
 	assert(name);
 	strncpy(g->name, name, MAXFN);
 }
@@ -29,31 +29,31 @@ void graph_assign_function(struct graph *g, char*name) {
        assert(name);
 
        if (strncmp(name, "exp", 4)==0)
-               g->func = &expa;
+	       g->func = &expa;
        else if (strncmp(name, "geom", 5)==0)
-               g->func = &geom;
+	       g->func = &geom;
        else {
-               fprintf(stderr,
-                "fatal: unrecognized function \"%s\" in %s\n",
-                name, net_file_name);
-               exit(EXIT_FAILURE);
+	       fprintf(stderr,
+		"fatal: unrecognized function \"%s\" in %s\n",
+		name, net_file_name);
+	       exit(EXIT_FAILURE);
        }
        strncpy(g->funcname, name, MAXTOKEN);
 }
 void graph_init_walkers(struct graph*g, int nwalkers) {
-        struct walker *w;
-        int i;
+	struct walker *w;
+	int i;
 
-        assert(nwalkers>1);
-        assert(g->maxsteps>0);
+	assert(nwalkers>1);
+	assert(g->maxsteps>0);
 
-        g->w = nwalkers;
-        g->walkers = CALLOC(g->w, sizeof(struct walker));
-        for (i=0; i<g->w; i++) {
-                w = &g->walkers[i];
-                snprintf(w->name, MAXTOKEN, "walker%d", i+1);
-                w->path = CALLOC(g->maxsteps+1, sizeof(struct vertex*));
-        }
+	g->w = nwalkers;
+	g->walkers = CALLOC(g->w, sizeof(struct walker));
+	for (i=0; i<g->w; i++) {
+		w = &g->walkers[i];
+		snprintf(w->name, MAXTOKEN, "walker%d", i+1);
+		w->path = CALLOC(g->maxsteps+1, sizeof(struct vertex*));
+	}
 }
 
 static struct vertex *vertex_lookup(struct graph*g, char *name) {
@@ -73,20 +73,20 @@ struct vertex *graph_vertex_add(struct graph*g, char *name) {
 
 	if (g->n>=MAXN) {
 		fprintf(stderr, "%s:%d Graph capacity for vertices exceeded: %d\n",
-                        __FILE__, (int)__LINE__, MAXN);
-                exit(EXIT_FAILURE);
-        }
+			__FILE__, (int)__LINE__, MAXN);
+		exit(EXIT_FAILURE);
+	}
 
 	v = vertex_lookup(g, name);
 	if (!v) {
-                assert(g->w > 1);
+		assert(g->w > 1);
 		v = &g->vertices[g->n++];
 		strncpy(v->name, name, MAXTOKEN);
 		v->arcs = NULL;
-                v->repel = 0.0;
-                // Allocate memory to store the visits by the walkers
-                // in the vertices
-                v->visits = CALLOC(g->w, sizeof(struct walker*));
+		v->repel = 0.0;
+		// Allocate memory to store the visits by the walkers
+		// in the vertices
+		v->visits = CALLOC(g->w, sizeof(struct walker*));
 	}
 	return v;
 }
@@ -108,9 +108,9 @@ static struct arc *arc_add(struct graph*g, char *from, char *to) {
 
 	if (g->m>=MAXM) {
 		fprintf(stderr, "%s:%d Graph capacity for vertices exceeded: %d\n",
-                      __FILE__, (int)__LINE__, MAXM);
-                exit(EXIT_FAILURE);
-        }
+		      __FILE__, (int)__LINE__, MAXM);
+		exit(EXIT_FAILURE);
+	}
 	a = &g->area[g->m++];
 	a->tip = vs[1];
 	a->next = vs[0]->arcs;
@@ -147,33 +147,33 @@ void graph_self_loops_add(struct graph *g) {
   the vertex v by nvisits.
 */
 void graph_visits_incr(struct graph*g,
-		        struct vertex*v,
-		        struct walker*w,
-                        int time,
-		        int nvisits) {
-        int idx = w - &g->walkers[0];
+			struct vertex*v,
+			struct walker*w,
+			int time,
+			int nvisits) {
+	int idx = w - &g->walkers[0];
 
 	assert(g);
 	assert(v);
-        assert(w);
+	assert(w);
 	assert(idx>=0);
-        assert(nvisits>0);
+	assert(nvisits>0);
 
 	v->visits[idx] += nvisits;
 }
 
 void graph_visit(struct graph*g, struct vertex*v,
-                 struct walker*w, int time) {
+		 struct walker*w, int time) {
 	assert(g);
 	assert(v);
 
-        graph_visits_incr(g, v, w, time, 1);
-        w->path[time] = v;
+	graph_visits_incr(g, v, w, time, 1);
+	w->path[time] = v;
 }
 
-INLINE void graph_free(struct graph *g) {
+inline void graph_free(struct graph *g) {
 	struct vertex *v;
-        struct walker *w;
+	struct walker *w;
 	int i;
 
 	if (g) {
@@ -181,31 +181,31 @@ INLINE void graph_free(struct graph *g) {
 			v = &g->vertices[i];
 			FREE(v->visits);
 		}
-       		for (i=0; i<g->w; i++) {
+		for (i=0; i<g->w; i++) {
 			w = &g->walkers[i];
 			FREE(w->path);
 		}
-                FREE(g->walkers);
-                FREE(g);
+		FREE(g->walkers);
+		FREE(g);
 	}
 }
 
 void graph_print(struct graph*g, FILE *f) {
 	struct vertex *v, *x;
 	struct arc *a;
-        struct walker *w;
+	struct walker *w;
 	int i, j;
-        char loc;
+	char loc;
 
-        if (f==NULL)
-                f = stdout;
+	if (f==NULL)
+		f = stdout;
 
-        fprintf(f, "* Parameters\n");
-        fprintf(f, "alpha=%2.3f\n", g->alpha);
-        fprintf(f, "function=%s\n", g->funcname);
-        fprintf(f, "maxsteps=%d\n", g->maxsteps);
-        fprintf(f, "walkers=%d\n", g->w);
-        fprintf(f, "* Graph(V, E)=%s(%d, %d)\n", g->name, g->n, g->m);
+	fprintf(f, "* Parameters\n");
+	fprintf(f, "alpha=%2.3f\n", g->alpha);
+	fprintf(f, "function=%s\n", g->funcname);
+	fprintf(f, "maxsteps=%d\n", g->maxsteps);
+	fprintf(f, "walkers=%d\n", g->w);
+	fprintf(f, "* Graph(V, E)=%s(%d, %d)\n", g->name, g->n, g->m);
 	for (i=0; i<g->n; i++) {
 		v = &g->vertices[i];
 		fprintf(f, "%s:", v->name);
@@ -215,12 +215,12 @@ void graph_print(struct graph*g, FILE *f) {
 		}
 		fprintf(f, ";");
 		for (j=0; j<g->w; j++) {
-                        loc = ' ';
-                        w = &g->walkers[j];
-                        if (w->path[0]==v)
-                                loc = '@';
+			loc = ' ';
+			w = &g->walkers[j];
+			if (w->path[0]==v)
+				loc = '@';
 			fprintf(f, " %cvisits(walker%d, t0)=%d", loc, j+1, v->visits[j]);
-                }
+		}
 
 		fprintf(f, "\n");
 	}

@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -70,52 +71,52 @@ static int input_ln(void) {
 
 static void check_constraints(struct graph *g) {
 	struct vertex *v;
-        struct walker *w;
-       	int i, j;
-        /* Array with all visits at time indexed by walker. */
-        int *allvisits0;
-        int prev;
+	struct walker *w;
+	int i, j;
+	/* Array with all visits at time indexed by walker. */
+	int *allvisits0;
+	int prev;
 	/*
 	  Check if all walkers have a initial location determined.
 	*/
-        allvisits0 = CALLOC(g->w, sizeof(int));
+	allvisits0 = CALLOC(g->w, sizeof(int));
 	for (i=0; i<g->w; i++) {
 		w = &g->walkers[i];
-                v = w->path[0];
-	        if (v == NULL) {
+		v = w->path[0];
+		if (v == NULL) {
 			fprintf(stderr, "%s:%d Walker %d was not initialized.\n",
 			      net_file_name, lineno, (i+1));
-                               exit(EXIT_FAILURE);
+			       exit(EXIT_FAILURE);
 		}
-                /*
-                   Set default number of steps for non-initialized
-                   initial (t=0) walker's visits to vertices.
-                 */
-                for (j=0; j<g->n; j++) {
-                        v = &g->vertices[j];
-                        if (v->visits[i] == 0)
-                                graph_visits_incr(g, v, w, 0, DEFAULT_STEPS0);
+		/*
+		   Set default number of steps for non-initialized
+		   initial (t=0) walker's visits to vertices.
+		 */
+		for (j=0; j<g->n; j++) {
+			v = &g->vertices[j];
+			if (v->visits[i] == 0)
+				graph_visits_incr(g, v, w, 0, DEFAULT_STEPS0);
 
-                         allvisits0[i] += v->visits[i];
-                 }
+			 allvisits0[i] += v->visits[i];
+		 }
 	}
-        prev=allvisits0[0];
-        for (i=1; i<g->w; i++) {
-                if (prev != allvisits0[i]) {
+	prev=allvisits0[0];
+	for (i=1; i<g->w; i++) {
+		if (prev != allvisits0[i]) {
 			fprintf(stderr,
-                                "%s:%d Different initial number of"
-                                " steps for walkers %d (%d) and %d (%d).\n",
-			        net_file_name, lineno,
-                                i, allvisits0[i-1], i+1, allvisits0[i]);
-                               exit(EXIT_FAILURE);
-                }
-                prev=allvisits0[i];
-        }
-        FREE(allvisits0);
+				"%s:%d Different initial number of"
+				" steps for walkers %d (%d) and %d (%d).\n",
+				net_file_name, lineno,
+				i, allvisits0[i-1], i+1, allvisits0[i]);
+			       exit(EXIT_FAILURE);
+		}
+		prev=allvisits0[i];
+	}
+	FREE(allvisits0);
 }
 
-static INLINE void context_switch(struct graph*g) {
-        static char buf[MAXFN];
+static void context_switch(struct graph*g) {
+	static char buf[MAXFN];
 /* Check some constraints or set properties before changing context */
 	switch(ctx) {
 	case GRAPH: /* Graph section was completed */
@@ -123,8 +124,8 @@ static INLINE void context_switch(struct graph*g) {
 		if (!parms_ok) {
 			fprintf(stderr, "%s:%d Not all parameters were set.\n",
 				      net_file_name, lineno);
-                        exit(EXIT_FAILURE);
-                }
+			exit(EXIT_FAILURE);
+		}
 		strncpy(buf, net_file_name, MAXFN);
 		/* Remove the extension of file name. */
 		rm_ext(buf);
@@ -133,19 +134,19 @@ static INLINE void context_switch(struct graph*g) {
 		graph_set_name(g, buf);
 		break;
 	case VERTEX: /* Vertex section was completed */
-                check_constraints(g);
-    		break;
+		check_constraints(g);
+		break;
 	default:
 		break;
 	}
 	ctx++;
 }
 
-static INLINE int cmp0(int c) {
+static inline int cmp0(int c) {
 	return c==(int)'=';
 }
 
-static INLINE int cmp1(int c) {
+static inline int cmp1(int c) {
 	return c==(int)'-';
 }
 
@@ -163,11 +164,11 @@ static void fill_buffer_up_to(char buf[], enum tokcat stop) {
 
 	case EDGE_SEP:
 		cmp=&cmp1;
-                break;
+		break;
 	default:
 		fprintf(stderr, "%s:%d Unknown token..",
-                        net_file_name, lineno);
-                exit(EXIT_FAILURE);
+			net_file_name, lineno);
+		exit(EXIT_FAILURE);
 		break;
 	}
 
@@ -179,10 +180,10 @@ static void fill_buffer_up_to(char buf[], enum tokcat stop) {
 		if (cmp((int)*cp)) {
 			break;
 		}
-                if (isspace(*cp)) { /* ignore spaces=concatenate */
-                        cp++;
-                        continue;
-                }
+		if (isspace(*cp)) { /* ignore spaces=concatenate */
+			cp++;
+			continue;
+		}
 
 		*rcp++ = *cp++;
 	}
@@ -227,13 +228,13 @@ static void scan_graph_keyval(struct graph*g) {
 		nparms_count++;
 	} else {
 		fprintf(stderr, "%s:%d Syntax error\n",
-                        net_file_name, lineno);
-                exit(EXIT_FAILURE);
-        }
+			net_file_name, lineno);
+		exit(EXIT_FAILURE);
+	}
 
 	/* All parameters were parsed. */
 	if (nparms_count == NPARMS) {
-                g->maxsteps =  maxsteps;
+		g->maxsteps =  maxsteps;
 		graph_init_walkers(g, nwalkers);
 		g->alpha = alpha;
 		graph_assign_function(g, funcname);
@@ -357,7 +358,7 @@ void append_suffix(char str[], char *suf) {
 		if (rcp-&str[0] >= MAXFN ) {
 			fprintf(stderr, "%s:%d Exceed buffer capacity at \"%s\".\n",
 			      __FILE__, (int)__LINE__, __FUNCTION__);
-                        exit(errno);
-                }
+			exit(errno);
+		}
 	}
 }

@@ -11,14 +11,14 @@ extern FILE *log_file;
   The number of steps must be equal for all walkers.
 */
 static int sum_all_visits_of_v_mates(struct graph*g,
-                                     struct vertex*v) {
+				     struct vertex*v) {
 	struct vertex *x;
 	struct arc *a;
 	int sum;
 
 	for (sum=0, a=v->arcs; a; a=a->next) {
 		x = a->tip;
-                /* Arbitrary choice: 0  */
+		/* Arbitrary choice: 0  */
 		sum += x->visits[0];
 	}
 	return sum;
@@ -48,19 +48,19 @@ static double calc_repellency(struct graph*g, struct vertex *v,
 }
 
 static double calc_total_repellency(struct graph*g, struct vertex *v,
-                                   int walker_idx, int allvisits) {
-        struct vertex *x; /* v mate */
-        struct arc *a;
-        double sum=0.0;
-        double b; /* Multiplicative constant */
+				   int walker_idx, int allvisits) {
+	struct vertex *x; /* v mate */
+	struct arc *a;
+	double sum=0.0;
+	double b; /* Multiplicative constant */
 
-        b = (double)v->visits[walker_idx]/allvisits;
+	b = (double)v->visits[walker_idx]/allvisits;
 	for (a=v->arcs; a; a=a->next) {
 		x = a->tip;
 		x->repel = calc_repellency(g, x, walker_idx, allvisits, b);
-                sum += x->repel;
+		sum += x->repel;
 	}
-        return sum;
+	return sum;
 }
 
 /*
@@ -71,42 +71,42 @@ static struct vertex *choose_next_destination(struct graph*g,
 					      int idx, int time) {
 	struct vertex *v, *x;
 	struct arc *a;
-        struct walker *w;
+	struct walker *w;
 	double cum=0.0, r; /* cummulative sum and random number */
 	int allvisits; /* all visits in the neighborhood of v */
-   	double one; /* total coefficient repelling used to normalize rv */
+	double one; /* total coefficient repelling used to normalize rv */
 
-        w = &g->walkers[idx];
+	w = &g->walkers[idx];
 	/* Get the current location */
 	v = w->path[time];
 	assert(v);
 
 	allvisits = sum_all_visits_of_v_mates(g, v);
-        one = calc_total_repellency(g, v, idx, allvisits);
+	one = calc_total_repellency(g, v, idx, allvisits);
 
-        /* generate a fractional random number between 0.0 and 1.0 */
+	/* generate a fractional random number between 0.0 and 1.0 */
 	r = ( (double)rand() / (double)RAND_MAX );
 	for (a=v->arcs; a; a=a->next) {
-                x = a->tip;
-                /* Normalize repellency and
-                  accumulate it to find the range
-                   in which r is in. */
-                cum += x->repel/one;
-                /* When r is lower than summation, the range is found. */
-                if (r < cum)
-                        break;
+		x = a->tip;
+		/* Normalize repellency and
+		  accumulate it to find the range
+		   in which r is in. */
+		cum += x->repel/one;
+		/* When r is lower than summation, the range is found. */
+		if (r < cum)
+			break;
 	}
-        /* Log flag is enabled */
-        if (flags['l']) {
-                struct vertex *xx;
-                fprintf(log_file, "\t%s:", w->name);
-        	for (a=v->arcs; a; a=a->next) {
-                        xx = a->tip;
-                        fprintf(log_file, " Pr(%s)=%1.3f",
-                                xx->name, xx->repel/one);
-                }
-                fprintf(log_file, " rand=%1.3f choice=%s\n", r, x->name);
-        }
+	/* Log flag is enabled */
+	if (flags['l']) {
+		struct vertex *xx;
+		fprintf(log_file, "\t%s:", w->name);
+		for (a=v->arcs; a; a=a->next) {
+			xx = a->tip;
+			fprintf(log_file, " Pr(%s)=%1.3f",
+				xx->name, xx->repel/one);
+		}
+		fprintf(log_file, " rand=%1.3f choice=%s\n", r, x->name);
+	}
 	return x;
 }
 

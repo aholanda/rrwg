@@ -5,7 +5,7 @@ PREFIX := /usr/local
 
 VPATH = src:include
 
-rrwg: alloc.o data.o graph.o io.o main.o parse.o R.o walk.o
+rrwg: wrapper.o input.o graph.o rrwg.o output.o main.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 trash += rrwg *.dat *.log *.pdf *.R
