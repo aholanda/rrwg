@@ -1,6 +1,52 @@
 # Random Repelling Walks on Graphs
 
-Work in progress...
+ This program simulates the `n` particle's repelling random walks on
+arbitrary connected graphs. In this model, each particle has higher
+probability to visit the vertices which have been less visited by the
+other particles. Jun (2014) proved that two particles has small joint
+support if the repulsion is strong enough in a complete graph
+[Jun Chen, "Two particle's repelling random walks on the complete
+graph," Eletron. J. Probab. *19* (113), 1--17, 2014].
+
+## Description
+
+The computation is decomposed in three actions as suggested by
+Dijkstra (1972) [E. W. Dijkstra, "Structured Programming", 1972]:
+
+
+````
+{input,walks,output}
+````
+
+There are also [wrappers](src/wrapper.c) subroutines to help in the
+use of subroutines from C standard library. They provide an uniform
+mechanism to check errors or call a second subroutine but the
+additional computation is minimal.
+
+### Input
+
+The program [input](src/input.c) is a graph described inside a file in
+a simplified Pajek-like format. Some flags may be passed to alter the
+program behavior. From the description, a graph structure is created
+where the vertices are used as points to be visited by the walkers and
+the edges are path among these points.
+
+### Walks
+
+The objects that perform the [walks](src/walk.c) are named walkers.
+The vertices are visited by walkers that chooses the next vertex to be
+visited according to the number of other walkers visits. Each walker
+is repelled by others, that is the next vertex to be visited has
+probability inversely proportional to the number of visits of the
+other walkers in it. Self-loops are created by default because the
+vertex can stay at the same place to the next interaction.
+
+### Output
+
+The program [output](src/output.c) is the number of visits
+per time of each vertex. A file with R commands to plot the
+visits per time is written.
+
 
 ## Downloading
 
