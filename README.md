@@ -18,10 +18,13 @@ Dijkstra (1972) [E. W. Dijkstra, "Structured Programming", 1972]:
 "input,manipulation,output"
 ````
 
-There are also [wrapper](src/wrapper.c) subroutines to help in the
+Indeed, there are [wrapper](src/wrapper.c) subroutines to help in the
 use of subroutines from C standard library. They provide an uniform
 mechanism to check errors after a call to a second subroutine with little
-additional computation.
+additional computation. The fundamental data structure used 
+is [graph](src/graph.c).
+
+
 
 ### Input
 
