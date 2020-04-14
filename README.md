@@ -15,7 +15,7 @@ Dijkstra (1972) [E. W. Dijkstra, "Structured Programming", 1972]:
 
 
 ````
-{input,walks,output}
+"input,manipulation,output"
 ````
 
 There are also [wrapper](src/wrapper.c) subroutines to help in the
@@ -31,7 +31,7 @@ program behavior. From the description, a graph structure is created
 where the vertices are used as points to be visited by the walkers and
 the edges are path among these points.
 
-### Walks
+### Manipulation aka Walks
 
 The objects that perform the [walks](src/walk.c) are named walkers.
 The vertices are visited by walkers that choose the next vertex to be
