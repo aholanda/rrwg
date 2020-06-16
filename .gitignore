@@ -7,3 +7,8 @@ rrwg.1
 *.o
 *.pdf
 *.R
+
+
+#Added by cargo
+
+/target
