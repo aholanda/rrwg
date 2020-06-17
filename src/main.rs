@@ -1,33 +1,42 @@
-mod walker;
+mod walk;
 
-use huji::{Graph, VertexIndex};
+use std::{env, fs};
 
-#[derive(Debug)]
-pub struct Walker {
-    name: String,
-    path: Vec<VertexIndex>,
-}
+use toml::Value;
 
-impl Walker {
-    pub fn new(name: &String) -> Self {
-        Self{
-            name: name.to_string(),
-            path: vec![],
-        }
-    }
+use huji::Graph;
+use crate::walk::{RRWG, Walker};
 
-    pub fn go_to(&mut self, v: VertexIndex) {
-        self.path.push(v);
-    }
+fn print_help_msg() {
+    println!("usage:
+match_args <string>
+    Check whether given string is the answer.
+match_args {{increase|decrease}} <integer>
+    Increase or decrease given integer by one."
+    );
 }
 
 fn main() {
-    let walker = Walker::new(&1.to_string());
+    let args: Vec<String> = env::args().collect();
+    let mut rrwg: &RRWG;
+
+    match args.len() {
+        2 => {
+            let fname = &args[1];
+            read_file(fname);
+        },
+        _ => print_help_msg(),
+    }
+
+    let walker = Walker::new(0);
     let graph = Graph::new();
 
     println!("{:?}", walker);
 }
 
-fn walk(graph: &Graph) {
-    {}
+fn read_file(filename: &String) {
+    let toml_content = fs::read_to_string(filename)
+        .expect("Could not open file");
+
+    let rrwg_info = toml_content.parse::<Value>().unwrap();
 }
