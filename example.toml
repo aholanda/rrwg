@@ -1,0 +1,13 @@
+[parameters]
+alpha = 3.5
+function = "exp"
+maxsteps = 8
+
+[arcs]
+a = "b, c"
+b = "c, a"
+c = "a, b"
+
+[walkers]
+1 = "a"
+2 = "b"
