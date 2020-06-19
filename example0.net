@@ -1,15 +1,20 @@
-# Comments
-alpha=10.0
-function=exp
-maxsteps=1500
-walkers=2
+*vertices 3
+1 "a" @10
+2 "b" 10 @20
+3 "c" 2
 
-* Vertices
-a @1=10
-b 1=10 @2=20
-c 1=2
+*edges
+1 2
+1 3
+2 3
 
-* Edges
-a -- b
-b -- c
-a -- c
+% The initial number of steps for each walker are placed after
+% vertex label. The missing spots are filled with default number
+% of steps during initialization. '@' marks where a walker
+% begins at.
+% Each parameter is marked with '!' between comment symbol '%' and
+% the parameter key/value pair with no space between them.
+%!alpha=10.0
+%!function=exp
+%!maxsteps=1500
+%!walkers=2

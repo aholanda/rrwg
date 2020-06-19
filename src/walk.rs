@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::io::prelude::*;
-use huji::{Graph, VertexIndex};
 
+use huji::data::{Graph, VertexIndex};
 use huji::io::pajek;
 
 pub type VisitorIndex = usize;

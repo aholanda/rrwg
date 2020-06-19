@@ -2,7 +2,8 @@ mod walk;
 
 use std::env;
 
-use huji::Graph;
+use huji::data::Graph;
+use huji::io::pajek::read as read_pajek;
 use crate::walk::{RRWG};
 
 fn print_help_msg() {
@@ -21,6 +22,7 @@ fn main() {
     match args.len() {
         2 => {
             let fname = &args[1];
+            let mut graph = read_pajek(fname);
             rrwg = RRWG::new(fname);
         },
         _ => print_help_msg(),
