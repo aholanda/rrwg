@@ -1,7 +1,7 @@
 use std::env;
 
-use huji::{data::Graph,
-           io::{Parse,
+use huji::{adj::Graph,
+           io::{Parser,
                 pajek::Pajek}};
 use walks::{Map, Walks};
 
@@ -14,6 +14,14 @@ match_args {{increase|decrease}} <integer>
     );
 }
 
+struct Exp;
+
+impl WalkFunction for Exp {
+    fn walk(parms: Parameters) {
+
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().collect();
     let rrwg: Walks;
@@ -21,9 +29,10 @@ fn main() {
     match args.len() {
         2 => {
             let fname = &args[1];
-            let graph: Graph = *<Pajek as Parse>::read(fname);
+            let mut pjk = Pajek::new(fname);
+            let graph: &mut Graph = pjk.read();
             println!("{:?}", graph);
-            rrwg = Walks::new(Map::Graph(&graph));
+            rrwg = Walks::new(Map::Graph(&graph), 2);
         },
         _ => print_help_msg(),
     }
