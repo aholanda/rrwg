@@ -21,6 +21,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "matgrid"
+version = "0.0.0"
+
+[[package]]
 name = "rrwg"
 version = "0.1.0"
 dependencies = [
@@ -33,4 +37,5 @@ name = "walks"
 version = "0.0.0"
 dependencies = [
  "huji",
+ "matgrid",
 ]
