@@ -21,7 +21,7 @@ Dijkstra (1972) [E. W. Dijkstra, "Structured Programming", 1972]:
 Indeed, there are [wrapper](src/wrapper.c) subroutines to help in the
 use of subroutines from C standard library. They provide an uniform
 mechanism to check errors after a call to a second subroutine with little
-additional computation. The fundamental data structure used 
+additional computation. The fundamental data structure used
 is [graph](src/graph.c).
 
 
@@ -56,7 +56,7 @@ visits per time is written.
 The project can be downloaded using `git` as follows:
 
 ````
-$ git clone https://github.com/uspgraphbase/rrwg.git
+$ git clone https://github.com/aholanda/rrwg.git
 $ cd rrwg
 ````
 
