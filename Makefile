@@ -5,6 +5,8 @@ PREFIX := /usr/local
 
 VPATH = src:include
 
+default: help
+
 rrwg: wrapper.o input.o graph.o rrwg.o output.o main.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
@@ -23,14 +25,14 @@ rrwg.1: rrwg.md
 trash += rrwg.1
 
 clean:
-	$(RM) -r $(trash)
+	$(RM) -rv $(trash)
 
 checkalloc: rrwg example0.net
 	valgrind -v --leak-check=full --track-origins=yes ./$^
 
 install: rrwg rrwg.1
-	@install rrwg $(PREFIX)/bin
-	@install rrwg.1 $(PREFIX)/man/man1
+	@install -v rrwg $(PREFIX)/bin
+	@install -v rrwg.1 $(PREFIX)/man/man1
 	@echo "Successfully installed!"
 
 uninstall:
